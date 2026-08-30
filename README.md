@@ -16,14 +16,6 @@ App web per pianificare camionisti, tratte e manutenzioni della flotta. È un un
 
 Vai nel repository, apri `index.html`, clicca l'icona della matita (Edit), incolla il nuovo contenuto, poi **Commit changes**. Il sito pubblico si aggiorna da solo in un minuto.
 
-## Per togliere l'accesso al cliente dopo i 30 giorni
-
-Due modi, entrambi in **Settings → Pages**:
-- **Veloce e reversibile**: sotto "Branch" rimetti su "None" — la pagina smette di essere raggiungibile, il link del cliente non funziona più. Per riattivarla basta rimettere `main`.
-- **Definitivo**: vai in **Settings → General**, in fondo alla pagina **Delete this repository**.
-
-In alternativa puoi rendere il repository **Private** (Settings → General → Danger Zone → Change visibility) — ma con un account GitHub gratuito un repository privato non può usare GitHub Pages, quindi il sito smetterebbe comunque di essere raggiungibile: stesso effetto del primo metodo, solo un passaggio più lungo.
-
 ## Un limite importante da sapere
 
 I dati che tu o il cliente inserite (camion, tratte, richieste) si salvano **solo nel browser di chi li inserisce**, non su un server condiviso. Questo significa:
