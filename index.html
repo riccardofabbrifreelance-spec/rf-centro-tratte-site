@@ -1,0 +1,1238 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RF Centro Tratte</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#F2F4EF;
+    --surface:#FFFFFF;
+    --surface-2:#E7EBE1;
+    --border:#D3D9CB;
+    --text:#1F2933;
+    --text-muted:#5B6660;
+    --accent:#D9711F;
+    --accent-contrast:#FFFFFF;
+    --accent-soft:#F6E2CF;
+    --info:#3D5A73;
+    --info-soft:#E1E9EE;
+    --success:#3F8F5F;
+    --success-soft:#DEEEE2;
+    --warning:#B9800F;
+    --warning-soft:#F5E7C9;
+    --critical:#C0433B;
+    --critical-soft:#F6DAD6;
+    --shadow:0 1px 2px rgba(31,41,51,.06), 0 4px 14px rgba(31,41,51,.06);
+    --radius:10px;
+    --font-display:'Oswald','Arial Narrow',sans-serif;
+    --font-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+    --font-mono:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14181A;
+      --surface:#1D2326;
+      --surface-2:#232A2D;
+      --border:#333C3F;
+      --text:#E7ECE8;
+      --text-muted:#9AA6A0;
+      --accent:#E8863C;
+      --accent-contrast:#14181A;
+      --accent-soft:#3A2A17;
+      --info:#8FB2CC;
+      --info-soft:#233642;
+      --success:#63C08A;
+      --success-soft:#1E332A;
+      --warning:#E3B34C;
+      --warning-soft:#3A2E15;
+      --critical:#E1665C;
+      --critical-soft:#3B211E;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14181A;
+    --surface:#1D2326;
+    --surface-2:#232A2D;
+    --border:#333C3F;
+    --text:#E7ECE8;
+    --text-muted:#9AA6A0;
+    --accent:#E8863C;
+    --accent-contrast:#14181A;
+    --accent-soft:#3A2A17;
+    --info:#8FB2CC;
+    --info-soft:#233642;
+    --success:#63C08A;
+    --success-soft:#1E332A;
+    --warning:#E3B34C;
+    --warning-soft:#3A2E15;
+    --critical:#E1665C;
+    --critical-soft:#3B211E;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    font-size:14px;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.disp{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.03em;text-wrap:balance;}
+  .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums;}
+  button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit;}
+  a{color:var(--accent);}
+
+  /* ---------- topbar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:20;
+    background:var(--surface);
+    border-bottom:1px solid var(--border);
+  }
+  .topbar-inner{
+    max-width:1180px;margin:0 auto;padding:12px 20px;
+    display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+  }
+  .brand{display:flex;align-items:center;gap:10px;margin-right:auto;}
+  .brand svg{flex:0 0 auto;}
+  .brand-name{font-family:var(--font-display);font-size:19px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;}
+  .brand-name small{display:block;font-family:var(--font-body);text-transform:none;letter-spacing:0;font-size:11px;color:var(--text-muted);font-weight:400;margin-top:1px;}
+
+  .tabs{display:flex;gap:2px;background:var(--surface-2);border-radius:999px;padding:3px;}
+  .tab{
+    appearance:none;border:none;background:transparent;cursor:pointer;
+    padding:7px 16px;border-radius:999px;font-family:var(--font-display);
+    font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);
+  }
+  .tab.active{background:var(--accent);color:var(--accent-contrast);}
+  .tab .tab-count{font-family:var(--font-mono);opacity:.85;margin-left:4px;}
+
+  .topbar-right{display:flex;align-items:center;gap:12px;}
+  .alertpill{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--critical-soft);color:var(--critical);
+    border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:600;
+    cursor:pointer;border:none;
+  }
+  .alertpill.ok{background:var(--success-soft);color:var(--success);}
+  .alertpill svg{flex:0 0 auto;}
+  .savestatus{font-size:11.5px;color:var(--text-muted);display:flex;align-items:center;gap:6px;white-space:nowrap;}
+  .savestatus .dot{width:7px;height:7px;border-radius:50%;background:var(--text-muted);}
+  .savestatus.saved .dot{background:var(--success);}
+  .savestatus.saving .dot{background:var(--warning);animation:pulse 1s infinite;}
+  .savestatus.error .dot{background:var(--critical);}
+  @media (prefers-reduced-motion:no-preference){
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  }
+
+  /* ---------- layout ---------- */
+  .container{max-width:1180px;margin:0 auto;padding:22px 20px 80px;}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+  .panel-title{font-size:20px;margin:0;}
+  .subtle{color:var(--text-muted);font-size:12.5px;}
+  .toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+
+  .btn{
+    appearance:none;cursor:pointer;border-radius:8px;border:1px solid var(--border);
+    background:var(--surface);color:var(--text);padding:8px 14px;font-size:13px;font-weight:500;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .btn:hover{border-color:var(--accent);}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-contrast);font-weight:600;}
+  .btn.ghost{background:transparent;border-color:transparent;color:var(--text-muted);}
+  .btn.ghost:hover{color:var(--text);}
+  .btn.danger{color:var(--critical);border-color:var(--critical);background:transparent;}
+  .btn.sm{padding:5px 10px;font-size:12px;}
+  .btn.icon{padding:7px 9px;}
+  .btn:disabled{opacity:.45;cursor:default;}
+
+  .navgroup{display:flex;align-items:center;gap:4px;background:var(--surface-2);border-radius:8px;padding:3px;}
+  .navgroup .btn{background:transparent;border-color:transparent;}
+  .navgroup .rangelabel{font-family:var(--font-display);font-size:13px;letter-spacing:.03em;text-transform:uppercase;padding:0 8px;min-width:150px;text-align:center;}
+
+  .info-callout{
+    background:var(--info-soft);color:var(--info);border-radius:var(--radius);
+    padding:12px 14px;font-size:12.5px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;
+  }
+  .info-callout svg{flex:0 0 auto;margin-top:1px;}
+  .info-callout b{font-weight:600;}
+
+  /* ---------- badges / chips ---------- */
+  .badge{
+    display:inline-flex;align-items:center;gap:5px;border-radius:6px;padding:3px 8px;
+    font-size:11.5px;font-weight:600;font-family:var(--font-mono);white-space:nowrap;
+  }
+  .badge.ok{background:var(--success-soft);color:var(--success);}
+  .badge.warning{background:var(--warning-soft);color:var(--warning);}
+  .badge.critical{background:var(--critical-soft);color:var(--critical);}
+  .badge.neutral{background:var(--surface-2);color:var(--text-muted);}
+
+  .plate{
+    font-family:var(--font-mono);font-weight:600;letter-spacing:.05em;
+    background:var(--text);color:var(--bg);border-radius:5px;padding:3px 8px;font-size:12.5px;
+  }
+
+  /* ---------- calendar ---------- */
+  .cal-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);}
+  table.cal{border-collapse:collapse;width:100%;min-width:920px;}
+  table.cal th{
+    font-family:var(--font-display);font-weight:500;font-size:12px;letter-spacing:.04em;text-transform:uppercase;
+    text-align:left;color:var(--text-muted);padding:10px 10px;border-bottom:1px solid var(--border);
+    border-left:1px dashed var(--border);
+  }
+  table.cal th:first-child, table.cal td:first-child{border-left:none;}
+  table.cal th.today{color:var(--accent);}
+  table.cal td{
+    vertical-align:top;padding:8px;border-left:1px dashed var(--border);border-bottom:1px solid var(--border);
+    min-width:130px;
+  }
+  table.cal td.driver-cell{
+    font-family:var(--font-display);font-size:13px;letter-spacing:.02em;text-transform:uppercase;
+    background:var(--surface-2);min-width:130px;position:sticky;left:0;
+  }
+  table.cal td.driver-cell .drv-sub{display:block;font-family:var(--font-body);text-transform:none;letter-spacing:0;font-size:11px;color:var(--text-muted);margin-top:2px;font-weight:400;}
+  table.cal tr:last-child td{border-bottom:none;}
+  .cell-add{
+    width:100%;background:transparent;border:1px dashed var(--border);border-radius:7px;color:var(--text-muted);
+    padding:6px;font-size:11.5px;cursor:pointer;margin-top:4px;
+  }
+  .cell-add:hover{border-color:var(--accent);color:var(--accent);}
+  .assign-chip{
+    background:var(--surface-2);border:1px solid var(--border);border-left:3px solid var(--info);
+    border-radius:7px;padding:6px 8px;font-size:12px;cursor:pointer;margin-bottom:5px;
+  }
+  .assign-chip:hover{border-color:var(--accent);}
+  .assign-chip.urgente{border-left-color:var(--critical);}
+  .assign-chip .route{font-weight:600;display:block;margin-bottom:2px;}
+  .assign-chip .meta{color:var(--text-muted);font-size:11px;display:block;}
+  .assign-chip .flags{margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;}
+
+  .month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+  .month-dow{background:var(--surface-2);text-align:center;font-family:var(--font-display);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);padding:8px 4px;}
+  .month-day{background:var(--surface);min-height:92px;padding:6px;cursor:pointer;}
+  .month-day:hover{background:var(--surface-2);}
+  .month-day.pad{background:var(--bg);cursor:default;}
+  .month-day.today .daynum{color:var(--accent-contrast);background:var(--accent);}
+  .daynum{font-family:var(--font-mono);font-size:12px;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;}
+  .month-day .mchip{font-size:10.5px;background:var(--surface-2);border-left:2px solid var(--info);border-radius:4px;padding:2px 5px;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .month-day .mchip.urgente{border-left-color:var(--critical);}
+  .month-day .more{font-size:10.5px;color:var(--text-muted);margin-top:3px;}
+
+  /* ---------- fleet ---------- */
+  .fleet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+  .truck-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);}
+  .truck-card .tc-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;}
+  .truck-card .tc-type{font-family:var(--font-display);font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--text-muted);}
+  .tc-driver{font-size:12.5px;margin-bottom:12px;color:var(--text-muted);}
+  .tc-driver b{color:var(--text);font-weight:600;}
+  .tc-scadenze{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+  .tc-scad-item{background:var(--surface-2);border-radius:7px;padding:7px 9px;}
+  .tc-scad-item .lbl{display:block;font-size:10.5px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-family:var(--font-display);margin-bottom:3px;}
+  .tc-foot{display:flex;justify-content:space-between;align-items:center;border-top:1px dashed var(--border);padding-top:10px;margin-top:2px;}
+  .maint-toggle{background:none;border:none;color:var(--info);cursor:pointer;font-size:12px;font-weight:600;padding:0;}
+  .maint-list{margin-top:10px;border-top:1px dashed var(--border);padding-top:10px;display:flex;flex-direction:column;gap:6px;}
+  .maint-item{display:flex;justify-content:space-between;gap:8px;font-size:12px;}
+  .maint-item .mi-desc{color:var(--text-muted);}
+  .maint-item .mi-cost{font-family:var(--font-mono);white-space:nowrap;}
+  .maint-total{font-size:11.5px;color:var(--text-muted);margin-top:6px;}
+
+  .drivers-strip{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 28px;}
+  .driver-chip{background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 12px;font-size:12.5px;display:flex;align-items:center;gap:8px;}
+  .driver-chip .dc-name{font-weight:600;}
+  .driver-chip .dc-phone{color:var(--text-muted);font-family:var(--font-mono);font-size:11px;}
+  .driver-chip button{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0 2px;}
+  .driver-chip button:hover{color:var(--critical);}
+
+  /* ---------- requests ---------- */
+  .req-list{display:flex;flex-direction:column;gap:10px;}
+  .req-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;}
+  .req-row.urgente{border-left:3px solid var(--critical);}
+  .req-top{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;}
+  .req-main b{font-size:14px;}
+  .req-sub{color:var(--text-muted);font-size:12px;margin-top:3px;}
+  .req-actions{display:flex;gap:6px;flex-wrap:wrap;}
+  .avail-panel{margin-top:12px;border-top:1px dashed var(--border);padding-top:12px;}
+  .avail-truck{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--surface-2);border-radius:7px;margin-bottom:6px;}
+  .avail-truck .at-info{display:flex;align-items:center;gap:8px;font-size:12.5px;}
+  .avail-empty{font-size:12.5px;color:var(--text-muted);padding:8px 2px;}
+
+  .empty-state{color:var(--text-muted);font-size:13px;padding:26px 10px;text-align:center;border:1px dashed var(--border);border-radius:var(--radius);}
+
+  /* ---------- report ---------- */
+  .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:16px;}
+  .stat-tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;}
+  .stat-label{display:block;font-family:var(--font-display);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;}
+  .stat-value{display:block;font-family:var(--font-mono);font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;}
+  table.report-table th{border-left:none;}
+  table.report-table td{border-left:none;}
+
+  /* ---------- modal / forms ---------- */
+  .modal-overlay{position:fixed;inset:0;background:rgba(20,24,26,.5);display:flex;align-items:flex-start;justify-content:center;padding:5vh 16px;overflow-y:auto;z-index:100;}
+  .modal{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);width:100%;max-width:460px;padding:22px 22px 18px;}
+  .modal h3{margin:0 0 14px;font-size:17px;}
+  .form-row{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+  .form-row.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .form-row label{font-size:11.5px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-family:var(--font-display);}
+  .form-row input, .form-row select, .form-row textarea{
+    border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);
+    padding:8px 10px;font-size:13.5px;width:100%;
+  }
+  .form-row textarea{resize:vertical;min-height:52px;}
+  .form-row.checkline{flex-direction:row;align-items:center;gap:8px;}
+  .form-row.checkline label{text-transform:none;letter-spacing:0;font-family:var(--font-body);font-size:13px;color:var(--text);}
+  .modal-actions{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:8px;}
+  .field-error{font-size:11.5px;color:var(--critical);min-height:14px;margin-top:8px;}
+
+  @media (max-width:640px){
+    .topbar-inner{gap:10px;}
+    .tc-scadenze{grid-template-columns:1fr;}
+    .form-row.two{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+  <div id="root"><div style="padding:40px;text-align:center;color:var(--text-muted);font-size:13px;">Caricamento…</div></div>
+
+  <script id="state-json" type="application/json">{"drivers":[{"id":"d1","nome":"Marco Bellini","telefono":"339 123 4567"},{"id":"d2","nome":"Ahmed Idrissi","telefono":"340 765 4321"},{"id":"d3","nome":"Luca Ferretti","telefono":"333 555 8899"},{"id":"d4","nome":"Paolo Conti","telefono":"348 881 2233"}],"trucks":[{"id":"t1","targa":"FX612BM","tipo":"Frigorifero","driverId":"d1","assicurazione":"2026-09-18","revisione":"2027-03-02","ultimoTagliando":"2026-06-10","manutenzioni":[{"id":"m1","data":"2026-06-10","tipo":"Tagliando","descrizione":"Tagliando 60.000km, filtri e olio","costo":480},{"id":"m2","data":"2026-07-02","tipo":"Cambio gomme","descrizione":"4 gomme anteriori","costo":1120}]},{"id":"t2","targa":"GK044PZ","tipo":"Centinato","driverId":"d2","assicurazione":"2027-01-14","revisione":"2026-09-05","ultimoTagliando":"2026-05-20","manutenzioni":[{"id":"m3","data":"2026-05-20","tipo":"Tagliando","descrizione":"Tagliando ordinario","costo":390}]},{"id":"t3","targa":"EJ871TS","tipo":"Cassonato","driverId":"d3","assicurazione":"2026-12-01","revisione":"2027-05-11","ultimoTagliando":"2026-08-01","manutenzioni":[{"id":"m4","data":"2026-08-01","tipo":"Riparazione","descrizione":"Sostituzione frizione","costo":2150}]},{"id":"t4","targa":"HL290DV","tipo":"Cisterna","driverId":null,"assicurazione":"2026-10-30","revisione":"2027-02-20","ultimoTagliando":"2026-04-15","manutenzioni":[]}],"assignments":[{"id":"a1","data":"2026-08-25","driverId":"d1","truckId":"t1","tratta":"Valencia → Zaragoza","merce":"Ortofrutta refrigerata","cliente":"Frutas Levante SL","urgente":false,"stato":"Confermata","kmInizio":182300,"kmFine":182625,"dataPartenza":"2026-08-25","oraPartenza":"06:00","dataArrivo":"2026-08-25","oraArrivo":"10:30","note":""},{"id":"a2","data":"2026-08-26","driverId":"d2","truckId":"t2","tratta":"Valencia → Barcellona","merce":"Materiali edili pallettizzati","cliente":"Construcciones Iberica","urgente":false,"stato":"Confermata","kmInizio":96100,"kmFine":96450,"dataPartenza":"2026-08-26","oraPartenza":"05:30","dataArrivo":"2026-08-26","oraArrivo":"10:30","note":""},{"id":"a3","data":"2026-08-27","driverId":"d3","truckId":"t3","tratta":"Valencia → Madrid","merce":"Elettrodomestici","cliente":"Distribuidora Norte","urgente":false,"stato":"Confermata","kmInizio":210800,"kmFine":211155,"dataPartenza":"2026-08-27","oraPartenza":"06:15","dataArrivo":"2026-08-27","oraArrivo":"10:45","note":""},{"id":"a4","data":"2026-08-28","driverId":"d1","truckId":"t1","tratta":"Zaragoza → Valencia (rientro)","merce":"Vuoto","cliente":"-","urgente":false,"stato":"Confermata","kmInizio":182625,"kmFine":182950,"dataPartenza":"2026-08-28","oraPartenza":"07:00","dataArrivo":"2026-08-28","oraArrivo":"11:30","note":""},{"id":"a5","data":"2026-09-02","driverId":"d2","truckId":"t2","tratta":"Valencia → Milano","merce":"Pallet misti","cliente":"Logimix Italia","urgente":true,"stato":"Da confermare","note":"Confermare orario carico"},{"id":"a6","data":"2026-09-03","driverId":"d4","truckId":"t4","tratta":"Valencia → Lione","merce":"Prodotti chimici non pericolosi","cliente":"ChemPack SA","urgente":false,"stato":"Confermata","note":""}],"requests":[{"id":"r1","creato":"2026-08-29","cliente":"Horta Fresh Coop","telefono":"","merce":"Ortofrutta refrigerata","tratta":"Valencia → Tolosa","dataConsegna":"2026-09-01","urgente":true,"stato":"In attesa","assignmentId":null,"note":"Richiesta telefonica, cliente vuole conferma entro oggi"},{"id":"r2","creato":"2026-08-28","cliente":"Metalgrup Industrial","telefono":"","merce":"Bobine metalliche","tratta":"Valencia → Bilbao","dataConsegna":"2026-09-04","urgente":false,"stato":"In attesa","assignmentId":null,"note":""},{"id":"r3","creato":"2026-08-27","cliente":"Distribuidora Norte","telefono":"","merce":"Elettrodomestici","tratta":"Valencia → Madrid","dataConsegna":"2026-08-27","urgente":false,"stato":"Assegnata","assignmentId":"a3","note":""}]}</script>
+
+  <script>
+  // ===================== utils =====================
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function uid(p){ return (p||'id')+'_'+Math.random().toString(36).slice(2,9); }
+  function pad2(n){ return String(n).padStart(2,'0'); }
+  function toISO(d){ return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+  function parseISO(s){ var p=s.split('-'); return new Date(parseInt(p[0],10),parseInt(p[1],10)-1,parseInt(p[2],10)); }
+  function addDays(d,n){ var r=new Date(d); r.setDate(r.getDate()+n); return r; }
+  function startOfWeek(d){ var day=d.getDay(); var diff=(day+6)%7; return addDays(d,-diff); }
+  function startOfMonth(d){ return new Date(d.getFullYear(),d.getMonth(),1); }
+  function startOfYear(d){ return new Date(d.getFullYear(),0,1); }
+  var DOW=['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
+  var MON=['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+  function fmtShort(d){ return DOW[(d.getDay()+6)%7]+' '+d.getDate()+' '+MON[d.getMonth()]; }
+  function fmtDay(d){ return d.getDate()+' '+MON[d.getMonth()]; }
+  function todayISO(){ return toISO(new Date()); }
+  function daysUntil(iso){ var t=new Date(); t.setHours(0,0,0,0); var d=parseISO(iso); return Math.round((d-t)/86400000); }
+  function eur(n){ return (n||0).toLocaleString('it-IT',{style:'currency',currency:'EUR',maximumFractionDigits:0}); }
+  function numIt(n, dec){ return (n||0).toLocaleString('it-IT',{minimumFractionDigits:dec||0, maximumFractionDigits:dec||0}); }
+  function km(a){ return (a.kmInizio!=null && a.kmFine!=null && a.kmFine>=a.kmInizio) ? (a.kmFine-a.kmInizio) : 0; }
+  function hasKm(a){ return a.kmInizio!=null && a.kmFine!=null; }
+  function departureDT(a){ return (a.dataPartenza && a.oraPartenza) ? new Date(a.dataPartenza+'T'+a.oraPartenza+':00') : null; }
+  function arrivalDT(a){ return (a.dataArrivo && a.oraArrivo) ? new Date(a.dataArrivo+'T'+a.oraArrivo+':00') : null; }
+  function durataOre(a){
+    var d = departureDT(a), r = arrivalDT(a);
+    if(!d || !r) return null;
+    var diff = (r - d) / 3600000;
+    return diff>=0 ? diff : null;
+  }
+  function oreOf(a){ var v = durataOre(a); return v==null ? 0 : v; }
+  function hasOre(a){ return durataOre(a)!=null; }
+  function fmtDurata(ore){
+    if(ore==null) return '';
+    var totalMin = Math.round(ore*60);
+    var days = Math.floor(totalMin/1440);
+    var hours = Math.floor((totalMin%1440)/60);
+    var mins = totalMin%60;
+    if(days>0) return days+'g '+hours+'h';
+    if(mins>0) return hours+'h'+pad2(mins);
+    return hours+'h';
+  }
+
+  function periodRange(period, refIso){
+    var ref = parseISO(refIso);
+    if(period==='giorno'){
+      return { start: ref, end: ref, label: fmtDay(ref) + ' ' + ref.getFullYear() };
+    }
+    if(period==='settimana'){
+      var ws = startOfWeek(ref), we = addDays(ws,6);
+      return { start: ws, end: we, label: fmtDay(ws) + ' – ' + fmtDay(we) + ' ' + we.getFullYear() };
+    }
+    if(period==='mese'){
+      var ms = startOfMonth(ref), me = new Date(ms.getFullYear(), ms.getMonth()+1, 0);
+      return { start: ms, end: me, label: (MON[ms.getMonth()].charAt(0).toUpperCase()+MON[ms.getMonth()].slice(1)) + ' ' + ms.getFullYear() };
+    }
+    var ys = startOfYear(ref), ye = new Date(ys.getFullYear(),11,31);
+    return { start: ys, end: ye, label: String(ys.getFullYear()) };
+  }
+  function assignmentsInPeriod(period, refIso){
+    var r = periodRange(period, refIso);
+    var startIso = toISO(r.start), endIso = toISO(r.end);
+    return state.assignments.filter(function(a){ return a.data>=startIso && a.data<=endIso; });
+  }
+  function scadStatus(iso){
+    var d=daysUntil(iso);
+    if(d<0) return {level:'critical', txt:'scaduta da '+Math.abs(d)+'gg'};
+    if(d<=15) return {level:'critical', txt:'tra '+d+'gg'};
+    if(d<=30) return {level:'warning', txt:'tra '+d+'gg'};
+    return {level:'ok', txt:'tra '+d+'gg'};
+  }
+
+  // ===================== state =====================
+  var STORAGE_KEY = 'rf-centro-tratte-state-v1';
+  var state = null;
+  try{
+    var savedRaw = localStorage.getItem(STORAGE_KEY);
+    state = savedRaw ? JSON.parse(savedRaw) : JSON.parse(document.getElementById('state-json').textContent);
+  }catch(e){
+    console.error('load error', e);
+    try{ state = JSON.parse(document.getElementById('state-json').textContent); }
+    catch(e2){ state = {trucks:[],drivers:[],assignments:[],requests:[]}; }
+  }
+
+  var ui = { tab:'calendario', calView:'settimana', refDate: todayISO(), expandedTruck:null, expandedReq:null, modal:null,
+    reportPeriod:'settimana', reportRefDate: todayISO(), reportGroupBy:'camion' };
+
+  var STATUS_LABELS = {saved:'Salvato in questo browser', error:'Errore di salvataggio locale', unavailable:'Salvataggio non disponibile (modalità privata?)'};
+  var saveStatusKind = 'saved';
+  function setSaveStatus(kind){
+    saveStatusKind = kind;
+    var el = document.getElementById('savestatus');
+    if(!el) return;
+    el.className = 'savestatus ' + kind;
+    el.querySelector('.label').textContent = STATUS_LABELS[kind] || '';
+  }
+
+  function persist(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      setSaveStatus('saved');
+    }catch(e){
+      console.error('save error', e);
+      setSaveStatus('unavailable');
+    }
+  }
+
+  function mutate(fn){
+    fn(state);
+    render();
+    persist();
+  }
+
+  // ===================== domain helpers =====================
+  function driverName(id){ var d=state.drivers.find(function(x){return x.id===id;}); return d?d.nome:null; }
+  function truckById(id){ return state.trucks.find(function(x){return x.id===id;}); }
+  function isCompatible(tipo, merce){
+    var m = (merce||'').toLowerCase();
+    if(/frigo|refriger|deperibil/.test(m)) return tipo==='Frigorifero';
+    if(/chimic|liquid|cistern|carburant/.test(m)) return tipo==='Cisterna';
+    if(/pallet|material|edil|bobin|merce varia|misto|misti/.test(m)) return tipo==='Centinato' || tipo==='Cassonato';
+    return true;
+  }
+  function freeTrucksOn(iso, excludeAssignmentId){
+    return state.trucks.filter(function(t){
+      return !state.assignments.some(function(a){ return a.data===iso && a.truckId===t.id && a.id!==excludeAssignmentId; });
+    });
+  }
+
+  // ===================== export CSV =====================
+  function csvCell(v){
+    v = v==null ? '' : String(v);
+    if(/[;"\r\n]/.test(v)){ v = '"' + v.replace(/"/g,'""') + '"'; }
+    return v;
+  }
+  function toCSV(rows){
+    return rows.map(function(r){ return r.map(csvCell).join(';'); }).join('\r\n');
+  }
+  function csvAssegnazioni(){
+    var rows = [['Data','Camionista','Targa','Tipo camion','Tratta','Merce','Cliente','Stato','Urgente','Km percorsi','Partenza','Arrivo','Durata (ore)','Note']];
+    state.assignments.slice().sort(function(a,b){ return a.data<b.data?-1:1; }).forEach(function(a){
+      var t = truckById(a.truckId);
+      var partenza = (a.dataPartenza && a.oraPartenza) ? (a.dataPartenza+' '+a.oraPartenza) : '';
+      var arrivo = (a.dataArrivo && a.oraArrivo) ? (a.dataArrivo+' '+a.oraArrivo) : '';
+      rows.push([a.data, driverName(a.driverId)||'', t?t.targa:'', t?t.tipo:'', a.tratta, a.merce, a.cliente, a.stato, a.urgente?'SI':'NO', hasKm(a)?km(a):'', partenza, arrivo, hasOre(a)?numIt(durataOre(a),2):'', a.note||'']);
+    });
+    return rows;
+  }
+  function csvFlotta(){
+    var rows = [['Targa','Tipo','Camionista','Scadenza assicurazione','Scadenza revisione','Ultimo tagliando']];
+    state.trucks.forEach(function(t){
+      rows.push([t.targa, t.tipo, t.driverId?(driverName(t.driverId)||''):'', t.assicurazione, t.revisione, t.ultimoTagliando||'']);
+    });
+    return rows;
+  }
+  function csvManutenzioni(){
+    var rows = [['Targa','Data','Tipo intervento','Descrizione','Costo EUR']];
+    state.trucks.forEach(function(t){
+      t.manutenzioni.forEach(function(m){ rows.push([t.targa, m.data, m.tipo, m.descrizione||'', m.costo||0]); });
+    });
+    return rows;
+  }
+  function exportCSV(kind){
+    var builders = {assegnazioni: csvAssegnazioni, flotta: csvFlotta, manutenzioni: csvManutenzioni};
+    var build = builders[kind];
+    if(!build) return;
+    var csv = '\uFEFF' + toCSV(build());
+    var blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'rf-centro-tratte-' + kind + '-' + todayISO() + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  }
+
+  // ===================== render: shell =====================
+  function render(){
+    document.getElementById('root').innerHTML = renderAll();
+  }
+
+  function renderAll(){
+    return renderTopbar() + '<div class="container">' + renderTabContent() + '</div>' + renderModal();
+  }
+
+  var ROUTE_SVG = '<svg width="26" height="18" viewBox="0 0 26 18" fill="none">'
+    + '<circle cx="4" cy="14" r="3" fill="var(--accent)"/>'
+    + '<path d="M6 13 C 12 13, 10 3, 22 4" stroke="var(--accent)" stroke-width="2" stroke-dasharray="3 3" fill="none"/>'
+    + '<circle cx="22" cy="4" r="2.5" fill="none" stroke="var(--accent)" stroke-width="2"/>'
+    + '</svg>';
+
+  function scadEventsCount(){
+    var n=0;
+    state.trucks.forEach(function(t){
+      if(scadStatus(t.assicurazione).level!=='ok') n++;
+      if(scadStatus(t.revisione).level!=='ok') n++;
+    });
+    return n;
+  }
+
+  function renderTopbar(){
+    var pending = state.requests.filter(function(r){return r.stato==='In attesa';}).length;
+    var scad = scadEventsCount();
+    var tabs = [
+      {id:'calendario', label:'Calendario'},
+      {id:'flotta', label:'Flotta'},
+      {id:'richieste', label:'Richieste', count: pending},
+      {id:'report', label:'Report'}
+    ];
+    var tabsHtml = tabs.map(function(t){
+      return '<button class="tab '+(ui.tab===t.id?'active':'')+'" data-action="set-tab" data-tab="'+t.id+'">'+t.label
+        + (t.count ? '<span class="tab-count">'+t.count+'</span>' : '') + '</button>';
+    }).join('');
+    return ''
+      + '<div class="topbar"><div class="topbar-inner">'
+      + '<div class="brand">' + ROUTE_SVG + '<span class="brand-name">RF Centro Tratte<small>Pianificazione flotta e tratte</small></span></div>'
+      + '<div class="tabs">' + tabsHtml + '</div>'
+      + '<div class="topbar-right">'
+      + '<button class="alertpill '+(scad>0?'':'ok')+'" data-action="set-tab" data-tab="flotta" title="Vai a Flotta">'
+      + (scad>0
+          ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5"/><circle cx="12" cy="18" r=".5" fill="currentColor"/></svg>'+scad+' scadenz'+(scad===1?'a':'e')
+          : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>flotta in regola')
+      + '</button>'
+      + '<button class="btn ghost sm" data-action="open-export" title="Esporta dati in CSV"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg> Esporta</button>'
+      + '<span id="savestatus" class="savestatus '+saveStatusKind+'"><span class="dot"></span><span class="label">'+(STATUS_LABELS[saveStatusKind]||'')+'</span></span>'
+      + '</div>'
+      + '</div></div>';
+  }
+
+  function renderTabContent(){
+    if(ui.tab==='flotta') return renderFleetTab();
+    if(ui.tab==='richieste') return renderRequestsTab();
+    if(ui.tab==='report') return renderReportTab();
+    return renderCalendarTab();
+  }
+
+  // ===================== render: calendario =====================
+  function renderCalendarTab(){
+    var refD = parseISO(ui.refDate);
+    var rangeLabel;
+    if(ui.calView==='settimana'){
+      var ws = startOfWeek(refD), we = addDays(ws,6);
+      rangeLabel = fmtDay(ws) + ' – ' + fmtDay(we) + ' ' + we.getFullYear();
+    } else {
+      var mstart = startOfMonth(refD);
+      rangeLabel = (MON[mstart.getMonth()].charAt(0).toUpperCase()+MON[mstart.getMonth()].slice(1)) + ' ' + mstart.getFullYear();
+    }
+    var body = ui.calView==='settimana' ? renderWeekView(refD) : renderMonthView(refD);
+    return ''
+      + '<div class="panel-head">'
+      + '<div><h2 class="panel-title">Calendario tratte</h2><div class="subtle">'+state.drivers.length+' camionisti · '+state.assignments.length+' tratte pianificate</div></div>'
+      + '<div class="toolbar">'
+      + '<div class="tabs"><button class="tab '+(ui.calView==='settimana'?'active':'')+'" data-action="cal-view" data-view="settimana">Settimana</button>'
+      + '<button class="tab '+(ui.calView==='mese'?'active':'')+'" data-action="cal-view" data-view="mese">Mese</button></div>'
+      + '<div class="navgroup"><button class="btn icon" data-action="cal-nav" data-dir="-1">‹</button>'
+      + '<span class="rangelabel">'+esc(rangeLabel)+'</span>'
+      + '<button class="btn icon" data-action="cal-nav" data-dir="1">›</button></div>'
+      + '<button class="btn ghost sm" data-action="cal-today">Oggi</button>'
+      + '<button class="btn primary" data-action="open-assignment">+ Assegnazione</button>'
+      + '</div></div>'
+      + body;
+  }
+
+  function renderWeekView(refD){
+    if(state.drivers.length===0) return '<div class="empty-state">Nessun camionista registrato. Aggiungine uno dalla scheda Flotta.</div>';
+    var ws = startOfWeek(refD);
+    var days = [0,1,2,3,4,5,6].map(function(i){ return addDays(ws,i); });
+    var todI = todayISO();
+    var thead = '<tr><th></th>' + days.map(function(d){
+      var iso=toISO(d);
+      return '<th class="'+(iso===todI?'today':'')+'">'+DOW[(d.getDay()+6)%7]+' <span class="mono">'+d.getDate()+' '+MON[d.getMonth()]+'</span></th>';
+    }).join('') + '</tr>';
+
+    var rows = state.drivers.map(function(drv){
+      var cells = days.map(function(d){
+        var iso = toISO(d);
+        var items = state.assignments.filter(function(a){ return a.driverId===drv.id && a.data===iso; });
+        var chips = items.map(function(a){
+          var truck = truckById(a.truckId);
+          return '<div class="assign-chip '+(a.urgente?'urgente':'')+'" data-action="edit-assignment" data-id="'+a.id+'">'
+            + '<span class="route">'+esc(a.tratta)+'</span>'
+            + '<span class="meta">'+(truck?esc(truck.targa):'—')+' · '+esc(a.merce)+'</span>'
+            + '<span class="flags">'
+            + (a.stato==='Da confermare' ? '<span class="badge warning">DA CONFERMARE</span>' : '')
+            + (a.urgente ? '<span class="badge critical">URGENTE</span>' : '')
+            + (hasKm(a) ? '<span class="badge neutral">'+numIt(km(a))+' km</span>' : '')
+            + (hasOre(a) ? '<span class="badge neutral">'+fmtDurata(durataOre(a))+'</span>' : '')
+            + '</span></div>';
+        }).join('');
+        return '<td>' + chips + '<button class="cell-add" data-action="open-assignment" data-driver="'+drv.id+'" data-date="'+iso+'">+ aggiungi</button></td>';
+      }).join('');
+      return '<tr><td class="driver-cell">'+esc(drv.nome)+'<span class="drv-sub">'+esc(drv.telefono||'')+'</span></td>'+cells+'</tr>';
+    }).join('');
+
+    return '<div class="cal-scroll"><table class="cal"><thead>'+thead+'</thead><tbody>'+rows+'</tbody></table></div>';
+  }
+
+  function renderMonthView(refD){
+    var mstart = startOfMonth(refD);
+    var gridStart = startOfWeek(mstart);
+    var todI = todayISO();
+    var cellsHtml = '';
+    for(var i=0;i<42;i++){
+      var d = addDays(gridStart,i);
+      var iso = toISO(d);
+      var inMonth = d.getMonth()===mstart.getMonth();
+      var items = state.assignments.filter(function(a){ return a.data===iso; });
+      var shown = items.slice(0,2).map(function(a){
+        var truck = truckById(a.truckId);
+        return '<div class="mchip '+(a.urgente?'urgente':'')+'">'+(truck?esc(truck.targa):'')+' '+esc(a.tratta)+'</div>';
+      }).join('');
+      var more = items.length>2 ? '<div class="more">+'+(items.length-2)+' altre</div>' : '';
+      cellsHtml += '<div class="month-day '+(inMonth?'':'pad')+' '+(iso===todI?'today':'')+'" data-action="goto-day" data-date="'+iso+'">'
+        + '<span class="daynum">'+d.getDate()+'</span>'+shown+more+'</div>';
+    }
+    var dow = DOW.map(function(l){return '<div class="month-dow">'+l+'</div>';}).join('');
+    return '<div class="month-grid">'+dow+cellsHtml+'</div>';
+  }
+
+  // ===================== render: flotta =====================
+  function renderFleetTab(){
+    var driversHtml = state.drivers.length
+      ? state.drivers.map(function(d){
+          return '<div class="driver-chip"><span class="dc-name">'+esc(d.nome)+'</span><span class="dc-phone">'+esc(d.telefono||'')+'</span>'
+            + '<button data-action="open-driver" data-id="'+d.id+'" title="Modifica">✎</button></div>';
+        }).join('')
+      : '<span class="subtle">Nessun camionista registrato.</span>';
+
+    var cardsHtml = state.trucks.length ? state.trucks.map(renderTruckCard).join('') : '<div class="empty-state">Nessun camion registrato.</div>';
+
+    return ''
+      + '<div class="panel-head"><div><h2 class="panel-title">Flotta</h2><div class="subtle">'+state.trucks.length+' mezzi registrati</div></div>'
+      + '<div class="toolbar"><button class="btn" data-action="open-driver">+ Camionista</button><button class="btn primary" data-action="open-truck">+ Camion</button></div></div>'
+      + '<div class="drivers-strip">'+driversHtml+'</div>'
+      + '<div class="fleet-grid">'+cardsHtml+'</div>';
+  }
+
+  function renderTruckCard(t){
+    var drv = t.driverId ? driverName(t.driverId) : null;
+    var driverOptions = '<option value="">Nessun camionista</option>' + state.drivers.map(function(d){
+      return '<option value="'+d.id+'" '+(t.driverId===d.id?'selected':'')+'>'+esc(d.nome)+'</option>';
+    }).join('');
+    var assic = scadStatus(t.assicurazione);
+    var revis = scadStatus(t.revisione);
+    var year = new Date().getFullYear();
+    var totCost = t.manutenzioni.filter(function(m){ return m.data.slice(0,4)===String(year); })
+      .reduce(function(s,m){ return s + (m.costo||0); },0);
+    var expanded = ui.expandedTruck===t.id;
+    var maintHtml = '';
+    if(expanded){
+      var items = t.manutenzioni.slice().sort(function(a,b){ return a.data<b.data?1:-1; });
+      maintHtml = '<div class="maint-list">' + (items.length ? items.map(function(m){
+        return '<div class="maint-item"><span><span class="mono">'+m.data+'</span> — <b>'+esc(m.tipo)+'</b> <span class="mi-desc">'+esc(m.descrizione||'')+'</span></span>'
+          + '<span class="mi-cost">'+eur(m.costo)+' <button class="btn ghost sm" data-action="delete-maintenance" data-truck="'+t.id+'" data-id="'+m.id+'" title="Elimina">✕</button></span></div>';
+      }).join('') : '<span class="subtle">Nessun intervento registrato.</span>')
+      + '<div class="maint-total">Totale '+year+': <b>'+eur(totCost)+'</b></div></div>';
+    }
+    return ''
+      + '<div class="truck-card">'
+      + '<div class="tc-head"><span class="plate">'+esc(t.targa)+'</span><span class="tc-type">'+esc(t.tipo)+'</span></div>'
+      + '<div class="tc-driver">Camionista: <select data-action="set-truck-driver" data-truck="'+t.id+'" style="border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);padding:3px 6px;font-size:12px;">'+driverOptions+'</select></div>'
+      + '<div class="tc-scadenze">'
+      + '<div class="tc-scad-item"><span class="lbl">Assicurazione</span><span class="badge '+assic.level+'">'+t.assicurazione+'</span></div>'
+      + '<div class="tc-scad-item"><span class="lbl">Revisione</span><span class="badge '+revis.level+'">'+t.revisione+'</span></div>'
+      + '</div>'
+      + '<div class="subtle">Ultimo tagliando: <span class="mono">'+(t.ultimoTagliando||'—')+'</span></div>'
+      + '<div class="tc-foot">'
+      + '<button class="maint-toggle" data-action="toggle-maint" data-id="'+t.id+'">Storico manutenzioni ('+t.manutenzioni.length+')'+(expanded?' ▲':' ▼')+'</button>'
+      + '<div style="display:flex;gap:6px;">'
+      + '<button class="btn ghost sm" data-action="open-maintenance" data-truck="'+t.id+'">+ Intervento</button>'
+      + '<button class="btn ghost sm" data-action="open-truck" data-id="'+t.id+'">Modifica</button>'
+      + '</div></div>'
+      + maintHtml
+      + '</div>';
+  }
+
+  // ===================== render: richieste =====================
+  function renderRequestsTab(){
+    var reqs = state.requests.slice().sort(function(a,b){
+      if(a.urgente!==b.urgente) return a.urgente?-1:1;
+      return a.dataConsegna<b.dataConsegna?-1:1;
+    });
+    var pending = state.requests.filter(function(r){return r.stato==='In attesa';}).length;
+    var list = reqs.length ? reqs.map(renderRequestRow).join('') : '<div class="empty-state">Nessuna richiesta registrata.</div>';
+    return ''
+      + '<div class="panel-head"><div><h2 class="panel-title">Richieste clienti</h2><div class="subtle">'+pending+' in attesa di assegnazione</div></div>'
+      + '<div class="toolbar"><button class="btn primary" data-action="open-request">+ Nuova richiesta</button></div></div>'
+      + '<div class="info-callout"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><circle cx="12" cy="16.2" r=".4" fill="currentColor"/></svg>'
+      + '<span>Oggi le richieste arrivano per telefono e si registrano qui a mano. Questo è anche il punto in cui, in una fase successiva, un canale WhatsApp collegato a questo stesso calendario potrà proporre risposte automatiche sulla disponibilità.</span></div>'
+      + '<div class="req-list">'+list+'</div>';
+  }
+
+  function renderRequestRow(r){
+    var badgeLevel = r.stato==='Assegnata' ? 'ok' : (r.stato==='Rifiutata' ? 'neutral' : 'warning');
+    var linkedAssignment = r.assignmentId ? state.assignments.find(function(a){return a.id===r.assignmentId;}) : null;
+    var linkedTruck = linkedAssignment ? truckById(linkedAssignment.truckId) : null;
+    var actions = '';
+    if(r.stato==='In attesa'){
+      actions = '<button class="btn sm primary" data-action="toggle-avail" data-id="'+r.id+'">Verifica disponibilità</button>'
+        + '<button class="btn sm ghost" data-action="reject-request" data-id="'+r.id+'">Rifiuta</button>'
+        + '<button class="btn sm ghost" data-action="delete-request" data-id="'+r.id+'">Elimina</button>';
+    } else if(r.stato==='Assegnata'){
+      actions = '<button class="btn sm ghost" data-action="unassign-request" data-id="'+r.id+'">Annulla assegnazione</button>'
+        + '<button class="btn sm ghost" data-action="delete-request" data-id="'+r.id+'">Elimina</button>';
+    } else {
+      actions = '<button class="btn sm ghost" data-action="reopen-request" data-id="'+r.id+'">Riapri</button>'
+        + '<button class="btn sm ghost" data-action="delete-request" data-id="'+r.id+'">Elimina</button>';
+    }
+    var avail = ui.expandedReq===r.id ? renderAvailability(r) : '';
+    return ''
+      + '<div class="req-row '+(r.urgente?'urgente':'')+'">'
+      + '<div class="req-top"><div class="req-main"><b>'+esc(r.cliente)+'</b>'
+      + '<div class="req-sub">'+esc(r.merce)+' · '+esc(r.tratta)+' · consegna entro <span class="mono">'+r.dataConsegna+'</span>'
+      + (r.urgente ? ' · <span class="badge critical">URGENTE</span>' : '')+'</div>'
+      + (linkedTruck ? '<div class="req-sub">Assegnata a <span class="plate">'+esc(linkedTruck.targa)+'</span> — '+esc(driverName(linkedAssignment.driverId)||'')+'</div>' : '')
+      + '</div>'
+      + '<div style="display:flex;align-items:center;gap:8px;"><span class="badge '+badgeLevel+'">'+r.stato.toUpperCase()+'</span></div></div>'
+      + '<div class="req-actions" style="margin-top:8px;">'+actions+'</div>'
+      + avail
+      + '</div>';
+  }
+
+  function renderAvailability(r){
+    var free = freeTrucksOn(r.dataConsegna);
+    var compat = free.filter(function(t){ return isCompatible(t.tipo, r.merce); });
+    var altri = free.filter(function(t){ return !isCompatible(t.tipo, r.merce); });
+    function truckRow(t){
+      var drv = t.driverId ? driverName(t.driverId) : null;
+      return '<div class="avail-truck"><div class="at-info"><span class="plate">'+esc(t.targa)+'</span><span>'+esc(t.tipo)+'</span>'
+        + '<span class="subtle">'+(drv?esc(drv):'nessun camionista assegnato')+'</span></div>'
+        + (drv ? '<button class="btn sm primary" data-action="assign-request" data-req="'+r.id+'" data-truck="'+t.id+'">Assegna</button>' : '')
+        + '</div>';
+    }
+    var html = '<div class="avail-panel">';
+    if(compat.length){
+      html += '<div class="subtle" style="margin-bottom:6px;">Camion compatibili</div>' + compat.map(truckRow).join('');
+    }
+    if(altri.length){
+      html += '<div class="subtle" style="margin:10px 0 6px;">Altri camion liberi</div>' + altri.map(truckRow).join('');
+    }
+    if(!free.length){
+      html += '<div class="avail-empty">Nessun camion libero per il '+r.dataConsegna+'.</div>';
+      var sugg = [];
+      for(var i=1;i<=4;i++){
+        var d = addDays(parseISO(r.dataConsegna), i);
+        var iso = toISO(d);
+        var n = freeTrucksOn(iso).length;
+        sugg.push('<span class="badge neutral">'+fmtDay(d)+': '+n+' liber'+(n===1?'o':'i')+'</span>');
+      }
+      html += '<div class="subtle" style="margin-top:8px;">Prossimi giorni: </div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">'+sugg.join('')+'</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  // ===================== render: report =====================
+  function reportRows(assignments, groupBy){
+    var map = {};
+    assignments.forEach(function(a){
+      var key, label;
+      if(groupBy==='camion'){
+        var t = truckById(a.truckId);
+        key = a.truckId || '—'; label = t ? (t.targa+' — '+t.tipo) : '(camion eliminato)';
+      } else if(groupBy==='camionista'){
+        key = a.driverId || '—'; label = driverName(a.driverId) || '(camionista eliminato)';
+      } else {
+        var c = (a.cliente||'').trim();
+        key = c || '(cliente non indicato)'; label = key;
+      }
+      if(!map[key]) map[key] = {label:label, count:0, km:0, ore:0, drivers:{}};
+      var row = map[key];
+      row.count++;
+      row.km += km(a);
+      row.ore += oreOf(a);
+      if(groupBy==='cliente'){
+        var dn = driverName(a.driverId) || '(camionista eliminato)';
+        row.drivers[dn] = (row.drivers[dn]||0) + oreOf(a);
+      }
+    });
+    return Object.keys(map).map(function(k){ return map[k]; }).sort(function(x,y){ return y.km-x.km; });
+  }
+
+  function renderReportTable(assignments, groupBy){
+    var rows = reportRows(assignments, groupBy);
+    if(!rows.length) return '<div class="empty-state">Nessuna tratta in questo periodo.</div>';
+    var headLabel = groupBy==='camion' ? 'Camion' : (groupBy==='camionista' ? 'Camionista' : 'Cliente');
+    var body = rows.map(function(r){
+      var driversHtml = '';
+      if(groupBy==='cliente'){
+        var parts = Object.keys(r.drivers).map(function(dn){ return esc(dn)+': '+numIt(r.drivers[dn],1)+'h'; });
+        driversHtml = '<div class="req-sub">'+parts.join(' · ')+'</div>';
+      }
+      return '<tr><td><b>'+esc(r.label)+'</b>'+driversHtml+'</td><td class="mono">'+r.count+'</td><td class="mono">'+numIt(r.km)+' km</td><td class="mono">'+numIt(r.ore,1)+' h</td></tr>';
+    }).join('');
+    return '<div class="cal-scroll"><table class="cal report-table"><thead><tr><th>'+headLabel+'</th><th>Tratte</th><th>Km</th><th>Ore</th></tr></thead><tbody>'+body+'</tbody></table></div>';
+  }
+
+  function renderReportTab(){
+    var range = periodRange(ui.reportPeriod, ui.reportRefDate);
+    var inPeriod = assignmentsInPeriod(ui.reportPeriod, ui.reportRefDate);
+    var withKm = inPeriod.filter(hasKm).length;
+    var withOre = inPeriod.filter(hasOre).length;
+    var totKm = inPeriod.reduce(function(s,a){ return s+km(a); },0);
+    var totOre = inPeriod.reduce(function(s,a){ return s+oreOf(a); },0);
+
+    var periodLabels = {giorno:'Giorno', settimana:'Settimana', mese:'Mese', anno:'Anno'};
+    var periodBtns = ['giorno','settimana','mese','anno'].map(function(p){
+      return '<button class="tab '+(ui.reportPeriod===p?'active':'')+'" data-action="report-period" data-period="'+p+'">'+periodLabels[p]+'</button>';
+    }).join('');
+
+    var groups = [['camion','Per camion'],['camionista','Per camionista'],['cliente','Per cliente']];
+    var groupBtns = groups.map(function(g){
+      return '<button class="tab '+(ui.reportGroupBy===g[0]?'active':'')+'" data-action="report-groupby" data-group="'+g[0]+'">'+g[1]+'</button>';
+    }).join('');
+
+    var statHtml = ''
+      + '<div class="stat-row">'
+      + '<div class="stat-tile"><span class="stat-label">Tratte nel periodo</span><span class="stat-value">'+inPeriod.length+'</span></div>'
+      + '<div class="stat-tile"><span class="stat-label">Km totali</span><span class="stat-value">'+numIt(totKm)+'</span></div>'
+      + '<div class="stat-tile"><span class="stat-label">Ore totali</span><span class="stat-value">'+numIt(totOre,1)+'</span></div>'
+      + '<div class="stat-tile"><span class="stat-label">Dati registrati</span><span class="stat-value" style="font-size:14px;">'+withKm+'/'+inPeriod.length+' km · '+withOre+'/'+inPeriod.length+' ore</span></div>'
+      + '</div>';
+
+    return ''
+      + '<div class="panel-head"><div><h2 class="panel-title">Report km e ore</h2><div class="subtle">Consuntivo su dati inseriti manualmente dopo ogni tratta</div></div>'
+      + '<div class="toolbar">'
+      + '<div class="tabs">'+periodBtns+'</div>'
+      + '<div class="navgroup"><button class="btn icon" data-action="report-nav" data-dir="-1">‹</button><span class="rangelabel">'+esc(range.label)+'</span><button class="btn icon" data-action="report-nav" data-dir="1">›</button></div>'
+      + '<button class="btn ghost sm" data-action="report-today">Oggi</button>'
+      + '</div></div>'
+      + '<div class="tabs" style="display:inline-flex;margin-bottom:14px;">'+groupBtns+'</div>'
+      + statHtml
+      + renderReportTable(inPeriod, ui.reportGroupBy);
+  }
+
+  // ===================== render: modali =====================
+  function renderModal(){
+    if(!ui.modal) return '';
+    var m = ui.modal;
+    var inner = '';
+    if(m.type==='assignment') inner = renderAssignmentModal(m);
+    else if(m.type==='truck') inner = renderTruckModal(m);
+    else if(m.type==='driver') inner = renderDriverModal(m);
+    else if(m.type==='maintenance') inner = renderMaintenanceModal(m);
+    else if(m.type==='request') inner = renderRequestModal(m);
+    else if(m.type==='export') inner = renderExportModal(m);
+    return '<div class="modal-overlay" data-action="modal-overlay-click"><div class="modal">'+inner+'</div></div>';
+  }
+
+  function renderExportModal(){
+    var rows = [
+      {kind:'assegnazioni', label:'Calendario tratte', sub:state.assignments.length+' righe — data, camionista, camion, tratta, cliente, km percorsi, ore guida'},
+      {kind:'flotta', label:'Anagrafica flotta', sub:state.trucks.length+' righe — targa, tipo, camionista, scadenze'},
+      {kind:'manutenzioni', label:'Manutenzioni', sub:state.trucks.reduce(function(n,t){return n+t.manutenzioni.length;},0)+' righe — targa, data, intervento, costo'}
+    ];
+    var list = rows.map(function(r){
+      return '<div class="avail-truck"><div class="at-info" style="flex-direction:column;align-items:flex-start;gap:2px;"><b>'+r.label+'</b><span class="subtle">'+r.sub+'</span></div>'
+        + '<button class="btn sm primary" data-action="export-csv" data-kind="'+r.kind+'">Scarica CSV</button></div>';
+    }).join('');
+    return ''
+      + '<h3>Esporta dati</h3>'
+      + '<div class="subtle" style="margin-bottom:12px;">File .csv: si aprono direttamente in Excel con un doppio click.</div>'
+      + list
+      + '<div class="modal-actions" style="justify-content:flex-end;"><button class="btn ghost" data-action="modal-cancel">Chiudi</button></div>';
+  }
+
+  function driverOptionsHtml(selectedId){
+    return '<option value="">Seleziona…</option>' + state.drivers.map(function(d){
+      return '<option value="'+d.id+'" '+(selectedId===d.id?'selected':'')+'>'+esc(d.nome)+'</option>';
+    }).join('');
+  }
+  function truckOptionsHtml(selectedId){
+    return '<option value="">Seleziona…</option>' + state.trucks.map(function(t){
+      return '<option value="'+t.id+'" '+(selectedId===t.id?'selected':'')+'>'+esc(t.targa)+' — '+esc(t.tipo)+'</option>';
+    }).join('');
+  }
+
+  function renderAssignmentModal(m){
+    var a = m.mode==='edit' ? state.assignments.find(function(x){return x.id===m.id;}) : null;
+    var driverId = a ? a.driverId : m.driverId;
+    var truckId = a ? a.truckId : (state.trucks[0]?state.trucks[0].id:'');
+    var data = a ? a.data : m.date;
+    return ''
+      + '<h3>'+(m.mode==='edit'?'Modifica assegnazione':'Nuova assegnazione')+'</h3>'
+      + '<div class="form-row two"><div><label>Camionista</label><select id="f-driverId">'+driverOptionsHtml(driverId)+'</select></div>'
+      + '<div><label>Camion</label><select id="f-truckId">'+truckOptionsHtml(truckId)+'</select></div></div>'
+      + '<div class="form-row two"><div><label>Data</label><input type="date" id="f-data" value="'+(data||'')+'"></div>'
+      + '<div><label>Stato</label><select id="f-stato"><option '+(a&&a.stato==='Da confermare'?'selected':'')+'>Da confermare</option><option '+((!a)||a.stato==='Confermata'?'selected':'')+'>Confermata</option></select></div></div>'
+      + '<div class="form-row"><label>Tratta</label><input type="text" id="f-tratta" placeholder="es. Valencia → Zaragoza" value="'+esc(a?a.tratta:'')+'"></div>'
+      + '<div class="form-row two"><div><label>Merce</label><input type="text" id="f-merce" value="'+esc(a?a.merce:'')+'"></div>'
+      + '<div><label>Cliente</label><input type="text" id="f-cliente" value="'+esc(a?a.cliente:'')+'"></div></div>'
+      + '<div class="form-row checkline"><input type="checkbox" id="f-urgente" '+(a&&a.urgente?'checked':'')+'><label for="f-urgente">Urgente</label></div>'
+      + '<div class="subtle" style="margin:4px 0 8px;">Consuntivo tratta (da compilare quando il camionista comunica i dati a fine viaggio)</div>'
+      + '<div class="form-row two"><div><label>Km partenza (tachimetro)</label><input type="number" min="0" step="1" id="f-kmInizio" value="'+(a&&a.kmInizio!=null?a.kmInizio:'')+'"></div>'
+      + '<div><label>Km arrivo (tachimetro)</label><input type="number" min="0" step="1" id="f-kmFine" value="'+(a&&a.kmFine!=null?a.kmFine:'')+'"></div></div>'
+      + '<div class="form-row two"><div><label>Giorno partenza</label><input type="date" id="f-dataPartenza" value="'+(a&&a.dataPartenza?a.dataPartenza:(data||''))+'"></div>'
+      + '<div><label>Orario partenza</label><input type="time" id="f-oraPartenza" value="'+(a&&a.oraPartenza?a.oraPartenza:'')+'"></div></div>'
+      + '<div class="form-row two"><div><label>Giorno arrivo</label><input type="date" id="f-dataArrivo" value="'+(a&&a.dataArrivo?a.dataArrivo:(data||''))+'"></div>'
+      + '<div><label>Orario arrivo</label><input type="time" id="f-oraArrivo" value="'+(a&&a.oraArrivo?a.oraArrivo:'')+'"></div></div>'
+      + '<div class="subtle" style="margin-top:-6px;">Se il camionista è fuori più giorni, basta mettere un giorno di arrivo diverso da quello di partenza.</div>'
+      + '<div class="form-row"><label>Note</label><textarea id="f-note">'+esc(a?a.note:'')+'</textarea></div>'
+      + '<div class="field-error" id="modal-error"></div>'
+      + '<div class="modal-actions">'
+      + (m.mode==='edit' ? '<button class="btn danger" data-action="modal-delete-assignment" data-id="'+m.id+'">Elimina</button>' : '<span></span>')
+      + '<div style="display:flex;gap:8px;"><button class="btn ghost" data-action="modal-cancel">Annulla</button><button class="btn primary" data-action="modal-save-assignment">Salva</button></div>'
+      + '</div>';
+  }
+
+  function renderTruckModal(m){
+    var t = m.mode==='edit' ? truckById(m.id) : null;
+    var tipi = ['Frigorifero','Centinato','Cassonato','Cisterna','Furgone'];
+    return ''
+      + '<h3>'+(m.mode==='edit'?'Modifica camion':'Nuovo camion')+'</h3>'
+      + '<div class="form-row two"><div><label>Targa</label><input type="text" id="f-targa" value="'+esc(t?t.targa:'')+'" style="text-transform:uppercase;"></div>'
+      + '<div><label>Tipo</label><select id="f-tipo">'+tipi.map(function(ty){ return '<option '+(t&&t.tipo===ty?'selected':'')+'>'+ty+'</option>'; }).join('')+'</select></div></div>'
+      + '<div class="form-row"><label>Camionista</label><select id="f-driverId">'+driverOptionsHtml(t?t.driverId:null)+'</select></div>'
+      + '<div class="form-row two"><div><label>Scadenza assicurazione</label><input type="date" id="f-assicurazione" value="'+(t?t.assicurazione:'')+'"></div>'
+      + '<div><label>Scadenza revisione</label><input type="date" id="f-revisione" value="'+(t?t.revisione:'')+'"></div></div>'
+      + '<div class="form-row"><label>Ultimo tagliando</label><input type="date" id="f-ultimoTagliando" value="'+(t?(t.ultimoTagliando||''):'')+'"></div>'
+      + '<div class="field-error" id="modal-error"></div>'
+      + '<div class="modal-actions">'
+      + (m.mode==='edit' ? '<button class="btn danger" data-action="modal-delete-truck" data-id="'+m.id+'">Elimina</button>' : '<span></span>')
+      + '<div style="display:flex;gap:8px;"><button class="btn ghost" data-action="modal-cancel">Annulla</button><button class="btn primary" data-action="modal-save-truck">Salva</button></div>'
+      + '</div>';
+  }
+
+  function renderDriverModal(m){
+    var d = m.mode==='edit' ? state.drivers.find(function(x){return x.id===m.id;}) : null;
+    return ''
+      + '<h3>'+(m.mode==='edit'?'Modifica camionista':'Nuovo camionista')+'</h3>'
+      + '<div class="form-row"><label>Nome</label><input type="text" id="f-nome" value="'+esc(d?d.nome:'')+'"></div>'
+      + '<div class="form-row"><label>Telefono</label><input type="text" id="f-telefono" value="'+esc(d?d.telefono:'')+'"></div>'
+      + '<div class="field-error" id="modal-error"></div>'
+      + '<div class="modal-actions">'
+      + (m.mode==='edit' ? '<button class="btn danger" data-action="modal-delete-driver" data-id="'+m.id+'">Elimina</button>' : '<span></span>')
+      + '<div style="display:flex;gap:8px;"><button class="btn ghost" data-action="modal-cancel">Annulla</button><button class="btn primary" data-action="modal-save-driver">Salva</button></div>'
+      + '</div>';
+  }
+
+  function renderMaintenanceModal(m){
+    var tipi = ['Tagliando','Cambio gomme','Revisione','Riparazione','Altro'];
+    return ''
+      + '<h3>Registra intervento</h3>'
+      + '<div class="form-row two"><div><label>Data</label><input type="date" id="f-data" value="'+todayISO()+'"></div>'
+      + '<div><label>Tipo</label><select id="f-tipo">'+tipi.map(function(ty){return '<option>'+ty+'</option>';}).join('')+'</select></div></div>'
+      + '<div class="form-row"><label>Descrizione</label><input type="text" id="f-descrizione" placeholder="es. Cambio olio e filtri"></div>'
+      + '<div class="form-row"><label>Costo (€)</label><input type="number" id="f-costo" min="0" step="1" value="0"></div>'
+      + '<div class="field-error" id="modal-error"></div>'
+      + '<div class="modal-actions"><span></span><div style="display:flex;gap:8px;"><button class="btn ghost" data-action="modal-cancel">Annulla</button><button class="btn primary" data-action="modal-save-maintenance">Salva</button></div></div>';
+  }
+
+  function renderRequestModal(m){
+    return ''
+      + '<h3>Nuova richiesta</h3>'
+      + '<div class="form-row two"><div><label>Cliente</label><input type="text" id="f-cliente"></div>'
+      + '<div><label>Consegna entro</label><input type="date" id="f-dataConsegna" value="'+ui.refDate+'"></div></div>'
+      + '<div class="form-row"><label>Tratta desiderata</label><input type="text" id="f-tratta" placeholder="es. Valencia → Bilbao"></div>'
+      + '<div class="form-row"><label>Merce</label><input type="text" id="f-merce"></div>'
+      + '<div class="form-row checkline"><input type="checkbox" id="f-urgente"><label for="f-urgente">Richiesta urgente</label></div>'
+      + '<div class="form-row"><label>Note</label><textarea id="f-note" placeholder="es. chiamata telefonica del cliente"></textarea></div>'
+      + '<div class="field-error" id="modal-error"></div>'
+      + '<div class="modal-actions"><span></span><div style="display:flex;gap:8px;"><button class="btn ghost" data-action="modal-cancel">Annulla</button><button class="btn primary" data-action="modal-save-request">Salva</button></div></div>';
+  }
+
+  function modalErr(msg){ var el=document.getElementById('modal-error'); if(el) el.textContent=msg; }
+
+  // ===================== actions =====================
+  function closeModal(){ ui.modal=null; render(); }
+
+  function openAssignmentModal(driverId, date, id){
+    ui.modal = id ? {type:'assignment', mode:'edit', id:id}
+      : {type:'assignment', mode:'add', driverId: driverId || (state.drivers[0]?state.drivers[0].id:''), date: date || ui.refDate};
+    render();
+  }
+  function saveAssignment(){
+    var driverId = document.getElementById('f-driverId').value;
+    var truckId = document.getElementById('f-truckId').value;
+    var data = document.getElementById('f-data').value;
+    var tratta = document.getElementById('f-tratta').value.trim();
+    if(!driverId || !truckId || !data || !tratta){ modalErr('Compila camionista, camion, data e tratta.'); return; }
+    var kmInizioRaw = document.getElementById('f-kmInizio').value;
+    var kmFineRaw = document.getElementById('f-kmFine').value;
+    var kmInizio = kmInizioRaw==='' ? null : parseFloat(kmInizioRaw);
+    var kmFine = kmFineRaw==='' ? null : parseFloat(kmFineRaw);
+    if(kmInizio!=null && kmFine!=null && kmFine<kmInizio){ modalErr('Il km di arrivo non può essere inferiore al km di partenza.'); return; }
+    var dataPartenza = document.getElementById('f-dataPartenza').value || null;
+    var oraPartenza = document.getElementById('f-oraPartenza').value || null;
+    var dataArrivo = document.getElementById('f-dataArrivo').value || null;
+    var oraArrivo = document.getElementById('f-oraArrivo').value || null;
+    if(dataPartenza && oraPartenza && dataArrivo && oraArrivo){
+      var dtP = new Date(dataPartenza+'T'+oraPartenza+':00');
+      var dtA = new Date(dataArrivo+'T'+oraArrivo+':00');
+      if(dtA < dtP){ modalErr('L\'arrivo non può essere prima della partenza.'); return; }
+    }
+    var obj = {
+      driverId: driverId, truckId: truckId, data: data, tratta: tratta,
+      merce: document.getElementById('f-merce').value.trim(),
+      cliente: document.getElementById('f-cliente').value.trim(),
+      stato: document.getElementById('f-stato').value,
+      urgente: document.getElementById('f-urgente').checked,
+      kmInizio: kmInizio, kmFine: kmFine,
+      dataPartenza: dataPartenza, oraPartenza: oraPartenza,
+      dataArrivo: dataArrivo, oraArrivo: oraArrivo,
+      note: document.getElementById('f-note').value.trim()
+    };
+    var m = ui.modal;
+    ui.modal = null;
+    mutate(function(st){
+      if(m.mode==='edit'){
+        var a = st.assignments.find(function(x){return x.id===m.id;});
+        if(a) Object.assign(a, obj);
+      } else {
+        obj.id = uid('a');
+        st.assignments.push(obj);
+      }
+    });
+  }
+  function deleteAssignment(id){
+    if(!confirm('Eliminare questa assegnazione?')) return;
+    ui.modal = null;
+    mutate(function(st){
+      st.assignments = st.assignments.filter(function(a){return a.id!==id;});
+      st.requests.forEach(function(r){ if(r.assignmentId===id){ r.assignmentId=null; r.stato='In attesa'; } });
+    });
+  }
+
+  function openTruckModal(id){ ui.modal = {type:'truck', mode: id?'edit':'add', id:id||null}; render(); }
+  function saveTruck(){
+    var targa = document.getElementById('f-targa').value.trim().toUpperCase();
+    var assicurazione = document.getElementById('f-assicurazione').value;
+    var revisione = document.getElementById('f-revisione').value;
+    if(!targa || !assicurazione || !revisione){ modalErr('Compila almeno targa, assicurazione e revisione.'); return; }
+    var obj = {
+      targa: targa, tipo: document.getElementById('f-tipo').value,
+      driverId: document.getElementById('f-driverId').value || null,
+      assicurazione: assicurazione, revisione: revisione,
+      ultimoTagliando: document.getElementById('f-ultimoTagliando').value || null
+    };
+    var m = ui.modal;
+    ui.modal = null;
+    mutate(function(st){
+      if(m.mode==='edit'){
+        var t = truckById(m.id);
+        if(t) Object.assign(t, obj);
+      } else {
+        obj.id = uid('t'); obj.manutenzioni = [];
+        st.trucks.push(obj);
+      }
+    });
+  }
+  function deleteTruck(id){
+    if(!confirm('Eliminare questo camion? Verranno rimosse anche le tratte assegnate.')) return;
+    ui.modal = null;
+    mutate(function(st){
+      var removedIds = st.assignments.filter(function(a){return a.truckId===id;}).map(function(a){return a.id;});
+      st.assignments = st.assignments.filter(function(a){return a.truckId!==id;});
+      st.requests.forEach(function(r){ if(removedIds.indexOf(r.assignmentId)!==-1){ r.assignmentId=null; r.stato='In attesa'; } });
+      st.trucks = st.trucks.filter(function(t){return t.id!==id;});
+    });
+  }
+
+  function openDriverModal(id){ ui.modal = {type:'driver', mode: id?'edit':'add', id:id||null}; render(); }
+  function saveDriver(){
+    var nome = document.getElementById('f-nome').value.trim();
+    if(!nome){ modalErr('Il nome è obbligatorio.'); return; }
+    var obj = { nome: nome, telefono: document.getElementById('f-telefono').value.trim() };
+    var m = ui.modal;
+    ui.modal = null;
+    mutate(function(st){
+      if(m.mode==='edit'){
+        var d = st.drivers.find(function(x){return x.id===m.id;});
+        if(d) Object.assign(d, obj);
+      } else {
+        obj.id = uid('d');
+        st.drivers.push(obj);
+      }
+    });
+  }
+  function deleteDriver(id){
+    if(state.assignments.some(function(a){return a.driverId===id;})){
+      alert('Impossibile eliminare: questo camionista ha tratte assegnate. Riassegna o elimina prima quelle tratte.');
+      return;
+    }
+    if(!confirm('Eliminare questo camionista?')) return;
+    ui.modal = null;
+    mutate(function(st){
+      st.trucks.forEach(function(t){ if(t.driverId===id) t.driverId=null; });
+      st.drivers = st.drivers.filter(function(d){return d.id!==id;});
+    });
+  }
+
+  function openMaintenanceModal(truckId){ ui.modal = {type:'maintenance', truckId: truckId}; render(); }
+  function saveMaintenance(){
+    var data = document.getElementById('f-data').value;
+    if(!data){ modalErr('Indica la data.'); return; }
+    var obj = {
+      id: uid('m'), data: data, tipo: document.getElementById('f-tipo').value,
+      descrizione: document.getElementById('f-descrizione').value.trim(),
+      costo: parseFloat(document.getElementById('f-costo').value) || 0
+    };
+    var truckId = ui.modal.truckId;
+    ui.modal = null;
+    mutate(function(st){
+      var t = truckById(truckId);
+      if(!t) return;
+      t.manutenzioni.push(obj);
+      if(obj.tipo==='Tagliando') t.ultimoTagliando = obj.data;
+    });
+  }
+  function deleteMaintenance(truckId, id){
+    if(!confirm('Eliminare questo intervento?')) return;
+    mutate(function(st){
+      var t = truckById(truckId);
+      if(t) t.manutenzioni = t.manutenzioni.filter(function(m){return m.id!==id;});
+    });
+  }
+
+  function openRequestModal(){ ui.modal = {type:'request'}; render(); }
+  function saveRequest(){
+    var cliente = document.getElementById('f-cliente').value.trim();
+    var dataConsegna = document.getElementById('f-dataConsegna').value;
+    if(!cliente || !dataConsegna){ modalErr('Compila almeno cliente e data di consegna.'); return; }
+    var obj = {
+      id: uid('r'), creato: todayISO(), cliente: cliente, telefono:'',
+      tratta: document.getElementById('f-tratta').value.trim(),
+      merce: document.getElementById('f-merce').value.trim(),
+      dataConsegna: dataConsegna,
+      urgente: document.getElementById('f-urgente').checked,
+      stato: 'In attesa', assignmentId: null,
+      note: document.getElementById('f-note').value.trim()
+    };
+    ui.modal = null;
+    mutate(function(st){ st.requests.push(obj); });
+  }
+  function deleteRequestAction(id){
+    if(!confirm('Eliminare questa richiesta?')) return;
+    mutate(function(st){ st.requests = st.requests.filter(function(r){return r.id!==id;}); });
+  }
+  function setRequestStatus(id, status){
+    mutate(function(st){ var r=st.requests.find(function(x){return x.id===id;}); if(r) r.stato=status; });
+  }
+  function unassignRequest(id){
+    mutate(function(st){
+      var r = st.requests.find(function(x){return x.id===id;});
+      if(!r) return;
+      if(r.assignmentId){ st.assignments = st.assignments.filter(function(a){return a.id!==r.assignmentId;}); }
+      r.assignmentId = null; r.stato = 'In attesa';
+    });
+  }
+  function assignRequestToTruck(reqId, truckId){
+    ui.expandedReq = null;
+    mutate(function(st){
+      var r = st.requests.find(function(x){return x.id===reqId;});
+      var t = truckById(truckId);
+      if(!r || !t || !t.driverId) return;
+      var a = { id: uid('a'), data: r.dataConsegna, driverId: t.driverId, truckId: t.id, tratta: r.tratta, merce: r.merce, cliente: r.cliente, urgente: r.urgente, stato:'Confermata', note: r.note||'' };
+      st.assignments.push(a);
+      r.stato = 'Assegnata'; r.assignmentId = a.id;
+    });
+  }
+
+  function navCal(dir){
+    if(ui.calView==='settimana'){
+      ui.refDate = toISO(addDays(parseISO(ui.refDate), dir*7));
+    } else {
+      var d = parseISO(ui.refDate);
+      ui.refDate = toISO(new Date(d.getFullYear(), d.getMonth()+dir, 1));
+    }
+  }
+
+  function navReport(dir){
+    var d = parseISO(ui.reportRefDate);
+    if(ui.reportPeriod==='giorno') ui.reportRefDate = toISO(addDays(d, dir));
+    else if(ui.reportPeriod==='settimana') ui.reportRefDate = toISO(addDays(d, dir*7));
+    else if(ui.reportPeriod==='mese') ui.reportRefDate = toISO(new Date(d.getFullYear(), d.getMonth()+dir, 1));
+    else ui.reportRefDate = toISO(new Date(d.getFullYear()+dir, d.getMonth(), d.getDate()));
+  }
+
+  // ===================== events =====================
+  document.addEventListener('click', function(e){
+    if(e.target && e.target.getAttribute && e.target.getAttribute('data-action')==='modal-overlay-click'){
+      closeModal(); return;
+    }
+    var el = e.target.closest('[data-action]');
+    if(!el) return;
+    var action = el.dataset.action;
+    switch(action){
+      case 'set-tab': ui.tab = el.dataset.tab; ui.expandedTruck=null; ui.expandedReq=null; render(); break;
+      case 'cal-view': ui.calView = el.dataset.view; render(); break;
+      case 'cal-nav': navCal(parseInt(el.dataset.dir,10)); render(); break;
+      case 'cal-today': ui.refDate = todayISO(); render(); break;
+      case 'goto-day': ui.refDate = el.dataset.date; ui.calView='settimana'; render(); break;
+      case 'open-assignment': openAssignmentModal(el.dataset.driver, el.dataset.date, null); break;
+      case 'edit-assignment': openAssignmentModal(null, null, el.dataset.id); break;
+      case 'modal-cancel': closeModal(); break;
+      case 'modal-save-assignment': saveAssignment(); break;
+      case 'modal-delete-assignment': deleteAssignment(el.dataset.id); break;
+      case 'open-truck': openTruckModal(el.dataset.id); break;
+      case 'modal-save-truck': saveTruck(); break;
+      case 'modal-delete-truck': deleteTruck(el.dataset.id); break;
+      case 'open-driver': openDriverModal(el.dataset.id); break;
+      case 'modal-save-driver': saveDriver(); break;
+      case 'modal-delete-driver': deleteDriver(el.dataset.id); break;
+      case 'open-maintenance': openMaintenanceModal(el.dataset.truck); break;
+      case 'modal-save-maintenance': saveMaintenance(); break;
+      case 'delete-maintenance': deleteMaintenance(el.dataset.truck, el.dataset.id); break;
+      case 'toggle-maint': ui.expandedTruck = (ui.expandedTruck===el.dataset.id? null: el.dataset.id); render(); break;
+      case 'open-request': openRequestModal(); break;
+      case 'modal-save-request': saveRequest(); break;
+      case 'open-export': ui.modal = {type:'export'}; render(); break;
+      case 'export-csv': exportCSV(el.dataset.kind); break;
+      case 'report-period': ui.reportPeriod = el.dataset.period; render(); break;
+      case 'report-nav': navReport(parseInt(el.dataset.dir,10)); render(); break;
+      case 'report-today': ui.reportRefDate = todayISO(); render(); break;
+      case 'report-groupby': ui.reportGroupBy = el.dataset.group; render(); break;
+      case 'delete-request': deleteRequestAction(el.dataset.id); break;
+      case 'reject-request': setRequestStatus(el.dataset.id,'Rifiutata'); break;
+      case 'reopen-request': setRequestStatus(el.dataset.id,'In attesa'); break;
+      case 'unassign-request': unassignRequest(el.dataset.id); break;
+      case 'toggle-avail': ui.expandedReq = (ui.expandedReq===el.dataset.id? null: el.dataset.id); render(); break;
+      case 'assign-request': assignRequestToTruck(el.dataset.req, el.dataset.truck); break;
+    }
+  });
+  document.addEventListener('change', function(e){
+    var el = e.target.closest('[data-action="set-truck-driver"]');
+    if(!el) return;
+    var truckId = el.dataset.truck, val = el.value || null;
+    mutate(function(st){ var t=truckById(truckId); if(t) t.driverId = val; });
+  });
+
+  // ===================== init =====================
+  render();
+  </script>
+</body>
+</html>
